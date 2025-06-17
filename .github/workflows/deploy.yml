@@ -24,10 +24,10 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload artifact from fronthead/
+      - name: Upload artifact from frontend/
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./fronthead  # On déploie le contenu du dossier fronthead
+          path: ./frontend  # On déploie le contenu du dossier fronthead
 
   deploy:
     needs: build
