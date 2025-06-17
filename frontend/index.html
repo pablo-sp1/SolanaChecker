@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solana Token Tracker | Web3 Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#00FFA3',
+            secondary: '#9945FF',
+            dark: '#0F1111',
+            light: '#F8FAFC',
+            accent: '#14F195',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Space Mono', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-dark text-light">
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+      <div class="flex items-center space-x-3">
+        <img src="logo_sol.png" alt="Solana Logo" class="w-10 h-10">
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          Solana Token Tracker
+        </h1>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button onclick="connectWallet()" id="connectButton" class="px-4 py-2 rounded-lg bg-gradient-to-r from-secondary to-primary text-dark font-semibold flex items-center space-x-2 hover:opacity-90 transition-opacity">
+          <i class="fas fa-plug"></i>
+          <span>Connect Wallet</span>
+        </button>
+        <button class="px-4 py-2 rounded-lg border border-gray-600 hover:border-primary text-light font-semibold flex items-center space-x-2 transition-colors">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </button>
+      </div>
+    </header>
+ 
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="token-card rounded-xl p-6">
+        <div class="flex justify-between mb-4">
+          <h3 class="text-gray-400">Total Supply</h3>
+          <i class="fas fa-coins text-primary text-xl"></i>
+        </div>
+        <p class="text-2xl font-bold">1,000,000 TKH</p>
+        <div class="mt-2 text-sm text-gray-400">Token Decimal: 6</div>
+      </div>
+
+      <div class="token-card rounded-xl p-6">
+        <div class="flex justify-between mb-4">
+          <h3 class="text-gray-400">Active Wallets</h3>
+          <i class="fas fa-wallet text-secondary text-xl"></i>
+        </div>
+        <p class="text-2xl font-bold"><span id="activeWalletsCount">...</span></p>
+      </div>
+
+      <div class="token-card rounded-xl p-6">
+        <div class="flex justify-between mb-4">
+          <h3 class="text-gray-400">Top Holder</h3>
+          <i class="fas fa-crown text-accent text-xl"></i>
+        </div>
+        <p id="topHolderAddress" class="text-xl font-mono truncate">Loading...</p>
+        <div id="topHolderAmount" class="mt-2 text-sm text-gray-400">Loading...</div>
+      </div>
+    </div>
+        <!-- Infos Wallet Connecté -->
+<section class="gradient-bg p-6 rounded-xl mb-8 border border-gray-800">
+  <h2 class="text-lg font-bold flex items-center space-x-2 mb-4">
+    <i class="fas fa-circle-check text-primary"></i>
+    <span>Wallet connecté</span>
+  </h2>
+
+  <div class="flex flex-col md:flex-row justify-between gap-4">
+    <!-- Wallet Adresse -->
+    <div class="flex-1">
+      <p class="text-sm text-gray-400 mb-1">Adresse</p>
+      <div id="connectedWalletDisplay" class="text-accent bg-gray-900 p-3 rounded-lg font-mono text-sm overflow-x-auto">
+        Aucun
+      </div>
+    </div>
+
+    <!-- Solde TKH -->
+    <div class="flex-1">
+      <p class="text-sm text-gray-400 mb-1">Solde TKH</p>
+      <div id="walletTkhBalance" class="text-primary bg-gray-900 p-3 rounded-lg font-bold text-lg text-center">
+        0 TKH
+      </div>
+    </div>
+
+    <!-- Solde SOL -->
+    <div class="flex-1">
+      <p class="text-sm text-gray-400 mb-1">Solde SOL</p>
+      <div id="walletSolBalance" class="text-accent bg-gray-900 p-3 rounded-lg font-bold text-lg text-center">
+        0 SOL
+      </div>
+    </div>
+  </div>
+</section>
+
+    <section class="gradient-bg rounded-xl p-6 mb-8 border border-gray-800">
+      <div class="flex flex-col md:flex-row justify-between mb-6 gap-4">
+        <div>
+          <h2 class="text-xl font-bold flex items-center space-x-2">
+            <i class="fas fa-chart-line text-primary"></i>
+            <span>Top Token Holders</span>
+          </h2>
+          <p class="text-gray-400 text-sm">Analyze the number of holders of your token</p>
+        </div>
+        <button onclick="getHolders()" class="px-6 py-2 rounded-lg solana-gradient text-dark font-semibold flex items-center space-x-2 hover:opacity-90 transition-opacity">
+          <i class="fas fa-sync-alt"></i>
+          <span>Refresh Data</span>
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700 table-hover">
+          <thead>
+            <tr>
+              <th class="px-4 py-3">Rank</th>
+              <th class="px-4 py-3">Token Account</th>
+              <th class="px-4 py-3">Wallet</th>
+              <th class="px-4 py-3">Amount</th>
+              <th class="px-4 py-3">% Supply</th>
+            </tr>
+          </thead>
+          <tbody id="holdersTable" class="divide-y divide-gray-800">
+            <tr><td colspan="5" class="text-center py-4 text-gray-400">Click "Refresh Data" to load</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="gradient-bg rounded-xl p-6 border border-gray-800">
+      <h2 class="text-xl font-bold flex items-center space-x-2 mb-6">
+        <i class="fas fa-search-dollar text-primary"></i><span>Wallet Balance Checker</span>
+      </h2>
+      <div class="flex gap-4 mb-6">
+        <input id="walletInput" placeholder="e.g. 8Yyc..." class="input-field flex-1 px-4 py-3 rounded-lg text-light" />
+        <button onclick="getBalance()" class="px-6 py-3 rounded-lg solana-gradient text-dark font-semibold hover:opacity-90">Check Balance</button>
+      </div>
+      <div id="balanceCard" class="token-card rounded-xl p-6 max-w-2xl hidden glow"></div>
+    </section>
+
+<div class="mb-4 text-sm text-gray-400">
+  <strong>Wallet connecté :</strong> <span id="connectedWallet">Aucun</span>
+</div>
+
+  <footer class="mt-12 pt-6 border-t border-gray-800 text-center text-gray-400 text-sm">
+    <p><i class="fas fa-code text-primary mr-2"></i>Solana Token Tracker - Powered by Web3</p>
+    <p class="mt-2"><i class="fas fa-network-wired mr-2"></i>Connected to: <span class="text-primary">Devnet</span></p>
+  </footer>
+
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.3.8/lib/index.iife.js"></script>
+  <script>
+    if (typeof splToken !== "undefined") {
+      console.log("✅ splToken chargé avec succès:", splToken);
+    } else {
+      console.error("❌ splToken non disponible !");
+    }
+  </script>
+    <script>
+      const {
+        Connection,
+        clusterApiUrl,
+        PublicKey,
+        Transaction
+      } = solanaWeb3;
+    
+      const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+      const API_URL = 'http://localhost:3000';
+      const TOTAL_SUPPLY = 1000000;
+      const TOKEN_MINT_ADDRESS = "GjfLko2rBuuunQTBVo9M4BHT4kx2LQHd55p8b7QuZUau";
+    
+      let walletPublicKey = null;
+    
+      async function connectWallet() {
+        if ('solana' in window && window.solana.isPhantom) {
+          try {
+            const resp = await window.solana.connect();
+            walletPublicKey = resp.publicKey;
+            document.getElementById('connectedWallet').textContent = walletPublicKey.toString();
+            document.getElementById('connectButton').innerHTML = `
+              <i class="fas fa-wallet"></i>
+              <span>${walletPublicKey.toString().slice(0, 4)}...${walletPublicKey.toString().slice(-4)}</span>`;
+              updateConnectedWalletInfo();
+          } catch (err) {
+            console.error("Connexion échouée :", err);
+          }
+        } else {
+          alert("Phantom Wallet non détecté !");
+          window.open("https://phantom.app/", "_blank");
+        }
+      }
+    
+      async function getHolders() {
+        try {
+          const res = await fetch(`${API_URL}/holders`);
+          const data = await res.json();
+          const tbody = document.getElementById('holdersTable');
+          tbody.innerHTML = '';
+          data.forEach((holder, index) => {
+            const amount = parseFloat(holder.amount);
+            const percentage = ((amount / TOTAL_SUPPLY) * 100).toFixed(2);
+            tbody.innerHTML += `
+              <tr>
+                <td class="px-4 py-2">${index + 1}</td>
+                <td class="px-4 py-2">${holder.token_account}</td>
+                <td class="px-4 py-2">${holder.owner_wallet}</td>
+                <td class="px-4 py-2">${holder.amount}</td>
+                <td class="px-4 py-2">${percentage}%</td>
+              </tr>`;
+          });
+        } catch (err) {
+          console.error("Erreur chargement holders :", err);
+        }
+      }
+    
+      async function getBalance() {
+        const wallet = document.getElementById('walletInput').value.trim();
+        const card = document.getElementById('balanceCard');
+        card.classList.remove('hidden');
+        card.innerHTML = `<div class="text-center text-gray-400 py-4"><i class="fas fa-spinner fa-spin"></i> Loading...</div>`;
+    
+        try {
+          const res = await fetch(`${API_URL}/balance/${wallet}`);
+          const data = await res.json();
+          const balance = data[0] || { uiAmount: 0, amount: 0, decimals: 6 };
+    
+          card.innerHTML = `
+            <h3 class="text-lg font-bold mb-2">Token Balance</h3>
+            <p><strong>Wallet:</strong> ${wallet}</p>
+            <p><strong>Formatted:</strong> ${balance.uiAmount} TKH</p>
+            <p><strong>Raw:</strong> ${balance.amount}</p>
+            <p><strong>Decimals:</strong> ${balance.decimals}</p>`;
+        } catch (err) {
+          console.error(err);
+          card.innerHTML = `<div class="text-red-500 text-center">Erreur lors de la récupération du solde</div>`;
+        }
+      }
+    
+      async function loadTopHolder() {
+        try {
+          const res = await fetch(`${API_URL}/holders`);
+          const data = await res.json();
+          if (data.length > 0) {
+            const top = data[0];
+            document.getElementById('topHolderAddress').textContent = `${top.owner_wallet.slice(0, 4)}...${top.owner_wallet.slice(-4)}`;
+            document.getElementById('topHolderAmount').textContent = `Holds ${top.amount} TKH`;
+          }
+        } catch (err) {
+          console.error("Erreur chargement Top Holder", err);
+        }
+      }
+    
+      async function loadActiveWallets() {
+        try {
+          const res = await fetch(`${API_URL}/active-wallets`);
+          const data = await res.json();
+          document.getElementById('activeWalletsCount').textContent = data.activeWallets;
+        } catch (err) {
+          console.error("Erreur récupération wallets actifs", err);
+        }
+      }
+
+      async function updateConnectedWalletInfo() {
+  if (!walletPublicKey) return;
+
+  // Adresse
+  document.getElementById("connectedWalletDisplay").textContent = walletPublicKey.toString();
+
+  // Solde TKH
+  try {
+    const res = await fetch(`${API_URL}/balance/${walletPublicKey}`);
+    const data = await res.json();
+    const balance = data[0] || { uiAmount: 0 };
+    document.getElementById("walletTkhBalance").textContent = `${balance.uiAmount} TKH`;
+  } catch (err) {
+    console.error("Erreur récupération balance TKH:", err);
+    document.getElementById("walletTkhBalance").textContent = "Erreur";
+  }
+
+  // Solde SOL
+  try {
+    const solBalance = await connection.getBalance(walletPublicKey);
+    const sol = solBalance / 1e9;
+    document.getElementById("walletSolBalance").textContent = `${sol.toFixed(4)} SOL`;
+  } catch (err) {
+    console.error("Erreur récupération SOL:", err);
+    document.getElementById("walletSolBalance").textContent = "Erreur";
+  }
+}
+
+
+
+    
+      window.addEventListener("DOMContentLoaded", () => {
+      loadTopHolder();
+      loadActiveWallets();
+      if (window.solana && window.solana.isPhantom) {
+        window.solana.connect({ onlyIfTrusted: true })
+          .then(({ publicKey }) => {
+            walletPublicKey = publicKey;
+            document.getElementById('connectedWallet').textContent = walletPublicKey.toString();
+            document.getElementById('connectButton').innerHTML = `
+              <i class="fas fa-wallet"></i>
+              <span>${walletPublicKey.toString().slice(0, 4)}...${walletPublicKey.toString().slice(-4)}</span>`;
+              updateConnectedWalletInfo();
+          })
+          .catch(() => {
+            console.log("Phantom non connecté automatiquement.");
+          });
+      }
+    });
+
+    window.connectWallet = connectWallet;
+    window.sendToken = sendToken;
+    window.getHolders = getHolders;
+    window.getBalance = getBalance;
+  </script>
+
+    
+  </body>
+  </html>

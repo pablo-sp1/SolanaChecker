@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #0A0A0A;
+  color: #F8FAFC;
+  min-height: 100vh;
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, rgba(17, 23, 34, 0.8) 0%, rgba(9, 10, 11, 0.9) 100%);
+}
+
+.solana-gradient {
+  background: linear-gradient(90deg, #9945FF 0%, #14F195 100%);
+}
+
+.token-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.input-field {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.input-field:focus {
+  border-color: #00FFA3;
+  box-shadow: 0 0 0 2px rgba(0, 255, 163, 0.2);
+}
+
+.glow {
+  box-shadow: 0 0 10px rgba(0, 255, 163, 0.5);
+}
+
+.table-hover tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.table-hover th {
+  background: rgba(20, 241, 149, 0.1);
+}
+
+.wallet-address {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+}
+
+.amount-cell {
+  font-family: 'Space Mono', monospace;
+}
+
+@media (max-width: 768px) {
+  .mobile-stack {
+    flex-direction: column;
+  }
+
+  .mobile-full {
+    width: 100%;
+  }
+}
+
+
+/* style.css */
+
+.solana-gradient {
+  background-image: linear-gradient(to right, #9945FF, #00FFA3);
+}
+
+.token-card {
+  background-color: #1a1a1a;
+  box-shadow: 0 0 12px rgba(0, 255, 163, 0.05);
+  border: 1px solid #2a2a2a;
+}
+
+.input-field {
+  background-color: #111;
+  border: 1px solid #333;
+}
+
+.glow {
+  box-shadow: 0 0 12px rgba(0, 255, 163, 0.2);
+}
