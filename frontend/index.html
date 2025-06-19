@@ -41,9 +41,9 @@
           <i class="fas fa-plug"></i>
           <span>Connect Wallet</span>
         </button>
-        <button class="px-4 py-2 rounded-lg border border-gray-600 hover:border-primary text-light font-semibold flex items-center space-x-2 transition-colors">
-          <i class="fas fa-cog"></i>
-          <span>Settings</span>
+        <button onclick="disconnectWallet()" class="px-4 py-2 rounded-lg border border-red-500 hover:bg-red-600 hover:text-white text-red-400 font-semibold flex items-center space-x-2 transition-all">
+          <i class="fas fa-unlink"></i>
+          <span>Disconnect</span>
         </button>
       </div>
     </header>
@@ -76,7 +76,6 @@
         <div id="topHolderAmount" class="mt-2 text-sm text-gray-400">Loading...</div>
       </div>
     </div>
-        <!-- Infos Wallet Connecté -->
 <section class="gradient-bg p-6 rounded-xl mb-8 border border-gray-800">
   <h2 class="text-lg font-bold flex items-center space-x-2 mb-4">
     <i class="fas fa-circle-check text-primary"></i>
@@ -84,7 +83,6 @@
   </h2>
 
   <div class="flex flex-col md:flex-row justify-between gap-4">
-    <!-- Wallet Adresse -->
     <div class="flex-1">
       <p class="text-sm text-gray-400 mb-1">Adresse</p>
       <div id="connectedWalletDisplay" class="text-accent bg-gray-900 p-3 rounded-lg font-mono text-sm overflow-x-auto">
@@ -92,7 +90,6 @@
       </div>
     </div>
 
-    <!-- Solde TKH -->
     <div class="flex-1">
       <p class="text-sm text-gray-400 mb-1">Solde TKH</p>
       <div id="walletTkhBalance" class="text-primary bg-gray-900 p-3 rounded-lg font-bold text-lg text-center">
@@ -100,7 +97,6 @@
       </div>
     </div>
 
-    <!-- Solde SOL -->
     <div class="flex-1">
       <p class="text-sm text-gray-400 mb-1">Solde SOL</p>
       <div id="walletSolBalance" class="text-accent bg-gray-900 p-3 rounded-lg font-bold text-lg text-center">
@@ -250,6 +246,29 @@
           card.innerHTML = `<div class="text-red-500 text-center">Erreur lors de la récupération du solde</div>`;
         }
       }
+
+      function disconnectWallet() {
+  if (window.solana && window.solana.isPhantom) {
+    try {
+      window.solana.disconnect();
+      walletPublicKey = null;
+
+      // Réinitialisation des éléments visuels
+      document.getElementById("connectedWallet").textContent = "Aucun";
+      document.getElementById("connectedWalletDisplay").textContent = "Aucun";
+      document.getElementById("walletTkhBalance").textContent = "0 TKH";
+      document.getElementById("walletSolBalance").textContent = "0 SOL";
+
+      // Remettre le bouton de connexion par défaut
+      document.getElementById("connectButton").innerHTML = `
+        <i class="fas fa-plug"></i>
+        <span>Connect Wallet</span>`;
+    } catch (err) {
+      console.error("Erreur lors de la déconnexion :", err);
+    }
+  }
+}
+
     
       async function loadTopHolder() {
         try {
@@ -278,10 +297,8 @@
       async function updateConnectedWalletInfo() {
   if (!walletPublicKey) return;
 
-  // Adresse
   document.getElementById("connectedWalletDisplay").textContent = walletPublicKey.toString();
 
-  // Solde TKH
   try {
     const res = await fetch(`${API_URL}/balance/${walletPublicKey}`);
     const data = await res.json();
@@ -292,7 +309,6 @@
     document.getElementById("walletTkhBalance").textContent = "Erreur";
   }
 
-  // Solde SOL
   try {
     const solBalance = await connection.getBalance(walletPublicKey);
     const sol = solBalance / 1e9;
@@ -329,6 +345,8 @@
     window.sendToken = sendToken;
     window.getHolders = getHolders;
     window.getBalance = getBalance;
+    window.disconnectWallet = disconnectWallet;
+
   </script>
 
     
