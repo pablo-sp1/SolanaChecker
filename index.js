@@ -10,19 +10,16 @@ app.use(cors());
 const PORT = 3000;
 const SOLANA_RPC_URL = 'https://api.devnet.solana.com';
 
-// Remplace ici par ton adresse de mint réelle
 const TOKEN_MINT_ADDRESS = 'GjfLko2rBuuunQTBVo9M4BHT4kx2LQHd55p8b7QuZUau'; // ← Mets ici ton token SPL
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Sert les fichiers frontend
 app.use(express.static(path.join(__dirname, 'frontend')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
-// Route enrichie : holders + owner_wallet
 app.get('/holders', async (req, res) => {
   try {
     const holdersRes = await fetch(SOLANA_RPC_URL, {
@@ -69,7 +66,6 @@ app.get('/holders', async (req, res) => {
   }
 });
 
-// Route : solde d’un wallet
 app.get('/balance/:wallet', async (req, res) => {
   const wallet = req.params.wallet;
 
@@ -98,7 +94,6 @@ app.get('/balance/:wallet', async (req, res) => {
   }
 });
 
-// Route : Nombre de wallets actifs détenant le token
 app.get('/active-wallets', async (req, res) => {
   try {
     const response = await fetch(SOLANA_RPC_URL, {
@@ -130,7 +125,6 @@ app.get('/active-wallets', async (req, res) => {
 
     const data = await response.json();
 
-    // Vérifie que data.result existe et est un tableau
     if (!data.result || !Array.isArray(data.result)) {
       return res.status(500).json({ error: 'Données invalides de Solana' });
     }

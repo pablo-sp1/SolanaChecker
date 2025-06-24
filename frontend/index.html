@@ -253,13 +253,11 @@
       window.solana.disconnect();
       walletPublicKey = null;
 
-      // Réinitialisation des éléments visuels
       document.getElementById("connectedWallet").textContent = "Aucun";
       document.getElementById("connectedWalletDisplay").textContent = "Aucun";
       document.getElementById("walletTkhBalance").textContent = "0 TKH";
       document.getElementById("walletSolBalance").textContent = "0 SOL";
 
-      // Remettre le bouton de connexion par défaut
       document.getElementById("connectButton").innerHTML = `
         <i class="fas fa-plug"></i>
         <span>Connect Wallet</span>`;
